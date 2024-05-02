@@ -64,4 +64,4 @@ The bot will scan alerts every 60 seconds, apply your filters, and print trade-r
 ## 📄 License
 
 MIT License — Free for personal and commercial use.
-<!-- updated: 2024-01-04-r01 -->
+<!-- updated: 2024-05-02-r01 -->
