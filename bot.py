@@ -55,7 +55,7 @@ def main():
 if __name__ == "__main__":
     main()
 
-    
+
 # This script fetches options alerts from Unusual Whales, filters them based on defined rules,
 # and prints valid trades. It runs in a loop, checking for new alerts every minute.
 # You can extend it to execute trades using IBKR API.
