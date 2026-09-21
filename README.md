@@ -1,68 +1,76 @@
+# Unusual Whales to IBKR Stock Bot
 
-# Unusual Whales to IBKR Trading Bot
-
-This Python bot fetches real-time options flow alerts from the [Unusual Whales Public API](https://unusualwhales.com/public-api), filters them based on your custom rules, and prepares them for automated trading through Interactive Brokers (IBKR).
-
----
-
-## ✅ Features
-
-- Real-time options flow data from Unusual Whales
-- Custom filters:
-  - Expiry ≥ 30 days
-  - Average fill ≥ $5
-  - Premium ≥ $100,000
-- Easy-to-modify filtering logic
-- Modular structure ready for IBKR order execution
+A Python bot that monitors unusual stock activity from the [Unusual Whales API](https://unusualwhales.com), filters by volume and price criteria, and automatically executes stock buy orders through Interactive Brokers (IBKR).
 
 ---
 
-## 📦 Requirements
+## Features
+
+- Polls Unusual Whales screener for high relative-volume stock alerts
+- Filters by minimum volume, price, and dollar volume thresholds
+- Executes market or limit buy orders via `ib_insync`
+- Deduplicates tickers within a session — won't re-enter the same stock twice
+- Dry-run mode for testing filters without submitting orders
+- Auto-reconnects to TWS on connection drop
+- All config via `.env` — no hardcoded values
+
+---
+
+## Requirements
 
 - Python 3.8+
-- `requests`
-- `python-dotenv`
-- An active Unusual Whales API key
-- IBKR TWS or IB Gateway running (for integration)
+- IBKR TWS or IB Gateway running locally
+- Active Unusual Whales API key
 
-Install dependencies:
 ```bash
-pip install -r requirements.txt
-````
-
----
-
-## 🔐 .env Setup
-
-Create a `.env` file in the root directory:
-
-```
-UNUSUAL_WHALES_API_KEY=your_api_key_here
+pip install requests python-dotenv ib_insync
 ```
 
 ---
 
-## 🚀 Run the Bot
+## .env Setup
+
+```env
+UNUSUAL_WHALES_API_KEY=your_key_here
+TWS_HOST=127.0.0.1
+TWS_PORT=7497
+TWS_CLIENT_ID=1
+
+# Filter thresholds
+MIN_VOLUME=500000
+MIN_PRICE=5.0
+MIN_DOLLAR_VOLUME=5000000
+
+# Order config
+ORDER_TYPE=MKT        # MKT or LMT
+SHARES_PER_TRADE=100
+
+# Set to true to log orders without submitting
+DRY_RUN=false
+```
+
+---
+
+## Run
 
 ```bash
 python bot.py
 ```
 
-The bot will scan alerts every 60 seconds, apply your filters, and print trade-ready alerts.
+Polls every 60 seconds. Qualifying tickers are logged and orders are placed immediately. Duplicate tickers within the same session are skipped.
 
 ---
 
-## 🛠 To-Do (Next Steps)
+## How It Works
 
-* [ ] Integrate IBKR via `ib_insync`
-* [ ] Add Discord/Webhook notifications
-* [ ] Optional: Web UI to control filters
-* [ ] Docker deployment
+1. Fetches the top 50 stocks by relative volume from Unusual Whales screener
+2. Applies filters: volume ≥ MIN_VOLUME, price ≥ MIN_PRICE, dollar volume ≥ MIN_DOLLAR_VOLUME
+3. Qualifies each ticker as a SMART-routed US equity contract via IBKR
+4. Places a market or limit buy order for SHARES_PER_TRADE shares
+5. Marks ticker as seen — won't trade it again until bot restarts
 
 ---
 
-## 📄 License
+## License
 
-MIT License — Free for personal and commercial use.
-<!-- updated: 2025-11-05-r01 -->
-
+MIT
